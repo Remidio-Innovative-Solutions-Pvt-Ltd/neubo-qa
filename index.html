@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Neubo — QA Builds</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #0a0a0a;
+            --card: #141414;
+            --card-hover: #1a1a1a;
+            --line: #222;
+            --text: #f5f5f5;
+            --muted: #8a8a8a;
+            --dim: #555;
+            --green: #3fbe77;
+            --amber: #e0a33e;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.5;
+            padding: 48px 20px 80px;
+        }
+
+        .wrap { max-width: 760px; margin: 0 auto; }
+
+        /* ---- header ---- */
+        .header { text-align: center; margin-bottom: 40px; }
+
+        .app-icon {
+            width: 96px; height: 96px;
+            border-radius: 22px;
+            margin: 0 auto 20px;
+            display: block;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+        }
+
+        h1 {
+            font-size: 34px; font-weight: 700; letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #fff 0%, #a0a0a0 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle { color: var(--muted); font-size: 16px; margin-top: 8px; }
+
+        .pill {
+            display: inline-block; margin-top: 16px;
+            padding: 5px 14px; border-radius: 999px;
+            background: rgba(224,163,62,0.12); color: var(--amber);
+            font-size: 12px; font-weight: 600; letter-spacing: 0.3px;
+            border: 1px solid rgba(224,163,62,0.3);
+        }
+
+        /* ---- section ---- */
+        .section-title {
+            font-size: 13px; font-weight: 700; letter-spacing: 0.6px;
+            text-transform: uppercase; color: var(--muted);
+            margin: 0 0 14px 4px;
+        }
+
+        /* ---- version group ---- */
+        .version-group { margin-bottom: 28px; }
+
+        .version-head {
+            font-size: 19px; font-weight: 700; letter-spacing: -0.2px;
+            margin: 0 0 10px 4px;
+        }
+
+        /* ---- build card ---- */
+        .build {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px 16px;
+            align-items: center;
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 16px 18px;
+            margin-bottom: 10px;
+            transition: background 0.15s ease;
+        }
+        .build:hover { background: var(--card-hover); }
+
+        .build-main { display: flex; align-items: center; gap: 14px; min-width: 0; }
+
+        .flavor-dot {
+            width: 10px; height: 10px; border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .dot-staging { background: var(--amber); box-shadow: 0 0 10px rgba(224,163,62,0.5); }
+        .dot-prodtest { background: var(--green); box-shadow: 0 0 10px rgba(63,190,119,0.5); }
+
+        .build-info { min-width: 0; }
+        .build-name { font-size: 15px; font-weight: 600; }
+        .build-meta { font-size: 13px; color: var(--muted); margin-top: 2px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+        .chip {
+            display: inline-block; padding: 2px 9px; border-radius: 6px;
+            font-size: 11px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase;
+        }
+        .chip-staging { background: rgba(224,163,62,0.15); color: var(--amber); }
+        .chip-prodtest { background: rgba(63,190,119,0.15); color: var(--green); }
+
+        .status { display: inline-flex; align-items: center; gap: 6px; color: var(--green); font-weight: 500; }
+        .status svg { width: 14px; height: 14px; }
+
+        .dl {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 20px; border-radius: 10px;
+            background: var(--green); color: #000;
+            font-size: 14px; font-weight: 600; text-decoration: none;
+            white-space: nowrap; transition: all 0.15s ease;
+        }
+        .dl:hover { background: #4dd88a; transform: translateY(-1px); }
+        .dl svg { width: 16px; height: 16px; }
+
+        /* ---- states ---- */
+        .state { text-align: center; color: var(--muted); padding: 40px 0; font-size: 15px; }
+
+        /* ---- install note ---- */
+        .note {
+            margin-top: 36px; padding: 20px 22px;
+            background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+            font-size: 14px; color: var(--muted); line-height: 1.7;
+        }
+        .note b { color: var(--text); }
+        .note .row { margin-top: 8px; }
+        .k-staging { color: var(--amber); font-weight: 600; }
+        .k-prodtest { color: var(--green); font-weight: 600; }
+
+        /* ---- footer ---- */
+        .footer { margin-top: 48px; text-align: center; color: var(--dim); font-size: 12px; }
+        .footer img { height: 24px; opacity: 0.45; margin-bottom: 10px; }
+        .footer p { margin-top: 4px; }
+
+        @media (max-width: 560px) {
+            .build { grid-template-columns: 1fr; }
+            .dl { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div class="header">
+            <img src="app-icon.png" alt="Neubo" class="app-icon">
+            <h1>Neubo QA</h1>
+            <p class="subtitle">Internal tester builds — staging &amp; production-test</p>
+            <span class="pill">Testers only · not for public release</span>
+        </div>
+
+        <div class="section-title">Build Uploads</div>
+        <div id="builds"><div class="state">Loading builds…</div></div>
+
+        <div class="note">
+            <b>Installing:</b> download the <b>.dmg</b>, open it, drag Neubo to Applications. Signed &amp; notarized — no Gatekeeper warning.
+            <div class="row"><span class="k-staging">Staging</span> — points at the staging server; for feature/QA testing.</div>
+            <div class="row"><span class="k-prodtest">Production-test</span> — the exact production binary against the production server; final validation before release.</div>
+        </div>
+
+        <div class="footer">
+            <a href="https://remidio.com"><img src="remidio-logo.png" alt="Remidio"></a>
+            <p>&copy; Remidio Innovative Solutions Pvt. Ltd. — Confidential QA distribution.</p>
+        </div>
+    </div>
+
+    <script>
+        const REPO = 'Remidio-Innovative-Solutions-Pvt-Ltd/neubo-qa';
+        const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20 6L9 17l-5-5"/></svg>';
+        const DL_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"/></svg>';
+
+        const FLAVORS = {
+            staging:  { label: 'Staging',         dot: 'dot-staging',  chip: 'chip-staging',  chipText: 'Staging' },
+            prodtest: { label: 'Production-test',  dot: 'dot-prodtest', chip: 'chip-prodtest', chipText: 'Prod-test' }
+        };
+
+        function parseTag(tag) {
+            const m = tag.match(/^(staging|prodtest|prod-test|production-test)-(.+)-(\d+)$/i);
+            if (!m) return null;
+            let f = m[1].toLowerCase().replace('production-test', 'prodtest').replace('prod-test', 'prodtest');
+            return { flavor: f, version: m[2], build: m[3] };
+        }
+
+        function fmtDate(iso) {
+            try {
+                return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+            } catch (e) { return ''; }
+        }
+
+        fetch(`https://api.github.com/repos/${REPO}/releases?per_page=100`)
+            .then(r => r.json())
+            .then(releases => {
+                const items = [];
+                for (const rel of releases) {
+                    if (rel.draft) continue;
+                    const p = parseTag(rel.tag_name);
+                    const dmg = (rel.assets || []).find(a => a.name.endsWith('.dmg'));
+                    if (!p || !dmg) continue;
+                    items.push({ ...p, date: rel.published_at, url: dmg.browser_download_url, size: dmg.size });
+                }
+                render(items);
+            })
+            .catch(() => {
+                document.getElementById('builds').innerHTML =
+                    '<div class="state">Couldn\'t load builds. <a href="https://github.com/' + REPO + '/releases" style="color:var(--green)">Open the releases page</a>.</div>';
+            });
+
+        function render(items) {
+            const el = document.getElementById('builds');
+            if (!items.length) { el.innerHTML = '<div class="state">No builds yet.</div>'; return; }
+
+            // group by version+build, newest build first
+            const groups = {};
+            for (const it of items) {
+                const key = it.version + ' (build ' + it.build + ')';
+                (groups[key] = groups[key] || []).push(it);
+            }
+            const keys = Object.keys(groups).sort((a, b) => {
+                const ba = parseInt(a.match(/build (\d+)/)[1]), bb = parseInt(b.match(/build (\d+)/)[1]);
+                return bb - ba;
+            });
+
+            let html = '';
+            for (const key of keys) {
+                html += '<div class="version-group"><div class="version-head">Neubo ' + key + '</div>';
+                // staging first, then prodtest, for stable ordering
+                const rows = groups[key].sort((a, b) => (a.flavor > b.flavor ? 1 : -1));
+                for (const it of rows) {
+                    const f = FLAVORS[it.flavor] || { label: it.flavor, dot: '', chip: 'chip-staging', chipText: it.flavor };
+                    const mb = it.size ? Math.round(it.size / 1048576) + ' MB' : '';
+                    html +=
+                        '<div class="build">' +
+                            '<div class="build-main">' +
+                                '<span class="flavor-dot ' + f.dot + '"></span>' +
+                                '<div class="build-info">' +
+                                    '<div class="build-name">' + f.label + '</div>' +
+                                    '<div class="build-meta">' +
+                                        '<span class="chip ' + f.chip + '">' + f.chipText + '</span>' +
+                                        '<span class="status">' + CHECK + 'Ready to test</span>' +
+                                        (it.date ? '<span>· ' + fmtDate(it.date) + '</span>' : '') +
+                                        (mb ? '<span>· ' + mb + '</span>' : '') +
+                                    '</div>' +
+                                '</div>' +
+                            '</div>' +
+                            '<a class="dl" href="' + it.url + '">' + DL_ICON + 'Download</a>' +
+                        '</div>';
+                }
+                html += '</div>';
+            }
+            el.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
