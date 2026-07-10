@@ -65,13 +65,35 @@
             margin: 0 0 14px 4px;
         }
 
-        /* ---- version group ---- */
-        .version-group { margin-bottom: 28px; }
+        /* ---- version group (collapsible accordion) ---- */
+        .version-group { margin-bottom: 12px; }
 
         .version-head {
-            font-size: 19px; font-weight: 700; letter-spacing: -0.2px;
-            margin: 0 0 10px 4px;
+            display: flex; align-items: center; gap: 10px;
+            font-size: 18px; font-weight: 700; letter-spacing: -0.2px;
+            padding: 9px 8px; margin: 0; cursor: pointer;
+            border-radius: 9px; user-select: none;
+            transition: background 0.12s ease;
         }
+        .version-head:hover { background: rgba(255,255,255,0.035); }
+        .version-head .title { flex: 1; }
+
+        .latest-badge {
+            font-size: 11px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase;
+            color: var(--green); background: rgba(63,190,119,0.13);
+            padding: 3px 9px; border-radius: 6px;
+        }
+        .chevron {
+            width: 16px; height: 16px; color: var(--muted);
+            transition: transform 0.18s ease; flex-shrink: 0;
+        }
+        .version-group.collapsed .chevron { transform: rotate(-90deg); }
+        .version-body { padding-top: 6px; }
+        .version-group.collapsed .version-body { display: none; }
+
+        .older-note { text-align: center; color: var(--muted); font-size: 13px; padding: 14px 0 2px; }
+        .older-note a { color: var(--green); text-decoration: none; }
+        .older-note a:hover { text-decoration: underline; }
 
         /* ---- build card ---- */
         .build {
@@ -231,9 +253,20 @@
                 return bb - ba;
             });
 
+            // Keep the page short: show the newest builds, collapse older ones,
+            // and cap the list — deep history lives on the GitHub releases page.
+            const MAX = 8;
+            const shown = keys.slice(0, MAX);
+            const hidden = keys.length - shown.length;
+
             let html = '';
-            for (const key of keys) {
-                html += '<div class="version-group"><div class="version-head">Neubo ' + key + '</div>';
+            shown.forEach((key, i) => {
+                const collapsedCls = i === 0 ? '' : ' collapsed';
+                const badge = i === 0 ? '<span class="latest-badge">Latest</span>' : '';
+                html += '<div class="version-group' + collapsedCls + '">' +
+                    '<div class="version-head"><span class="title">Neubo ' + key + '</span>' + badge +
+                        '<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"/></svg>' +
+                    '</div><div class="version-body">';
                 // staging first, then prodtest, for stable ordering
                 const rows = groups[key].sort((a, b) => (a.flavor > b.flavor ? 1 : -1));
                 for (const it of rows) {
@@ -256,9 +289,16 @@
                             '<a class="dl" href="' + it.url + '">' + DL_ICON + 'Download</a>' +
                         '</div>';
                 }
-                html += '</div>';
+                html += '</div></div>';
+            });
+            if (hidden > 0) {
+                html += '<div class="older-note">+ ' + hidden + ' older build' + (hidden > 1 ? 's' : '') +
+                        ' — <a href="https://github.com/' + REPO + '/releases">view all</a></div>';
             }
             el.innerHTML = html;
+            el.querySelectorAll('.version-head').forEach(function (h) {
+                h.addEventListener('click', function () { h.parentElement.classList.toggle('collapsed'); });
+            });
         }
     </script>
 </body>
