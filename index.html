@@ -123,6 +123,20 @@
         .build-name { font-size: 15px; font-weight: 600; }
         .build-meta { font-size: 13px; color: var(--muted); margin-top: 2px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 
+        /* ---- release notes ("what's new") ---- */
+        .build-notes {
+            grid-column: 1 / -1;
+            font-size: 13.5px; color: var(--text); line-height: 1.55;
+            padding-top: 13px; margin-top: 2px;
+            border-top: 1px solid var(--line);
+            white-space: pre-wrap; word-break: break-word;
+        }
+        .notes-label {
+            display: block;
+            font-size: 11px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase;
+            color: var(--dim); margin-bottom: 5px;
+        }
+
         .chip {
             display: inline-block; padding: 2px 9px; border-radius: 6px;
             font-size: 11px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase;
@@ -214,6 +228,10 @@
             return { flavor: f, version: m[2], build: m[3] };
         }
 
+        function esc(s) {
+            return s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+
         function fmtDate(iso) {
             try {
                 return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -229,7 +247,7 @@
                     const p = parseTag(rel.tag_name);
                     const dmg = (rel.assets || []).find(a => a.name.endsWith('.dmg'));
                     if (!p || !dmg) continue;
-                    items.push({ ...p, date: rel.published_at, url: dmg.browser_download_url, size: dmg.size });
+                    items.push({ ...p, date: rel.published_at, url: dmg.browser_download_url, size: dmg.size, notes: (rel.body || '').trim() });
                 }
                 render(items);
             })
@@ -287,6 +305,7 @@
                                 '</div>' +
                             '</div>' +
                             '<a class="dl" href="' + it.url + '">' + DL_ICON + 'Download</a>' +
+                            (it.notes ? '<div class="build-notes"><span class="notes-label">What\'s New</span>' + esc(it.notes) + '</div>' : '') +
                         '</div>';
                 }
                 html += '</div></div>';
